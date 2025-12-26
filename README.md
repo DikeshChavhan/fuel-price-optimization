@@ -64,7 +64,6 @@ For the current day:
    - expected profit  
 
 ---
-
 ## ▶️ How to Run
 
 Install dependencies:
@@ -72,15 +71,21 @@ Install dependencies:
 ```bash
 pip install pandas numpy scikit-learn joblib pyarrow
 ```
+
 Run pipeline:
+
 ```bash
 python src/pipeline.py
 ```
-Train model: 
+
+Train model:
+
 ```bash
 python src/train_model.py
 ```
-Generate price recommendation: 
+
+Generate price recommendation:
+
 ```bash
 python src/price_optimizer.py
 ```
@@ -94,6 +99,7 @@ python src/price_optimizer.py
   "expected_profit": 91833.27
 }
 ```
+
 
 
 
