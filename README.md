@@ -152,7 +152,7 @@ python src/price_optimizer.py
 ```
 
 ---
-🚀 Run the Streamlit Dashboard (UI Mode)
+**🚀 Run the Streamlit Dashboard (UI Mode)**
 
 To launch the interactive Fuel Price Optimization app:
 ```bash
