@@ -1,16 +1,42 @@
-# Fuel Price Optimization — ML Engineering Assignment
+# ⛽ Fuel Price Optimization — Machine Learning & Business Analytics Project
 
-This project implements an end-to-end Machine Learning pipeline to support
-daily retail fuel price recommendation. The goal is to recommend a price that
-maximizes daily profit while considering demand behaviour and competitor price
-movements.
+A complete end-to-end **Fuel Price Optimization System** that predicts demand, simulates pricing scenarios, and recommends the most profitable daily fuel price while respecting **business constraints and competitor movements**.
 
-The solution follows a practical engineering-oriented approach focusing on
-pipeline design, feature computation, model training, and a clean price
-optimization workflow.
+This project demonstrates **real-world ML engineering**, including:
+- data processing & feature engineering  
+- demand prediction using ML  
+- profit-based price optimization  
+- business rule enforcement  
+- interactive Streamlit dashboard  
+- reporting, history logs & export options  
 
 ---
 
+## 🎯 Problem Statement
+
+Fuel stations face a daily pricing challenge:
+
+- Higher price → higher margin but lower demand  
+- Lower price → higher demand but lower margin  
+
+The objective is to **maximize daily profit** while:
+- remaining competitive in the market  
+- avoiding price shocks  
+- maintaining safe margins  
+- following pricing regulations  
+
+This system predicts demand for different price levels and chooses the **optimal price that gives the highest safe profit**.
+
+---
+
+## 🧠 Solution Overview
+
+Data → Feature Engineering → ML Model → Price Simulation → Business Rules → Recommendation
+
+---
+
+
+---
 ## 📁 Project Structure
 ```
 fuel-price-optimization
@@ -27,44 +53,83 @@ fuel-price-optimization
 │
 ├── models/ # trained models (ignored in git)
 ├── README.md
+├── requirements.txt
 ├── .gitignore
 ```
 
 ---
 
-## 🧩 Approach Summary
-
-### 🔹 Data Engineering
-- Reads historical transaction data  
-- Validates and cleans records  
-- Generates engineered features:
-  - competitor price spread  
-  - lag & moving-average demand indicators  
-  - basic seasonality features  
-- Stores processed data for training  
-
-### 🔹 Machine Learning
-- Random Forest Regression model  
-- Predicts expected sales volume for a given price  
-- Evaluated using hold-out validation (MAE metric)  
-
-### 🔹 Price Optimization Logic
-For the current day:
-
-1. Generate candidate price range around last price  
-2. Predict expected volume for each price  
-3. Compute profit: **(price − cost) × volume**  
-4. Apply realistic business guardrails:
-   - daily price movement limits  
-   - competitor alignment checks  
-   - minimum margin protection  
-5. Return:
-   - recommended price  
-   - expected volume  
-   - expected profit  
 
 ---
-## ▶️ How to Run
+
+## 🧩 Feature Engineering Highlights
+
+- Competitor price spread  
+- Average competitor price index  
+- Lag price & lag demand features  
+- Moving-average demand indicators  
+- Day-of-week & seasonal signals  
+- Smart fallback handling for missing values  
+
+---
+
+## 🤖 Machine Learning Model
+
+- Algorithm → **Random Forest Regressor**  
+- Target → **Predicted daily fuel volume**
+- Evaluation → **MAE (Hold-out validation)**  
+- Model exported to `models/volume_model.pkl`
+
+Prediction feeds into **profit optimization logic**.
+
+---
+
+## 💰 Price Optimization Logic
+
+For each candidate price, the engine:
+
+1️⃣ Predicts expected volume  
+2️⃣ Computes profit → `(price − cost) × volume`  
+3️⃣ Applies business rules:
+
+- maximum daily price change
+- minimum margin safety threshold
+- competitor alignment tolerance
+
+4️⃣ Selects **highest-profit safe price**
+
+Returns:
+
+- 🟢 Recommended Price  
+- 📦 Expected Volume  
+- 💵 Expected Profit  
+- ⚠ Risk & Strategy Messages  
+
+---
+
+## 🖥️ Streamlit App Features
+
+✔ Fuel type selection (Petrol / Diesel)  
+✔ Business constraints panel  
+✔ Competitor price controls  
+✔ Risk alerts & pricing insights  
+✔ Demand & profit visualization  
+✔ Prediction history table  
+✔ Export results (CSV / PDF)  
+✔ Multilingual UI (English / Hindi / Marathi)
+
+Designed to simulate a **real pricing decision tool** used by fuel retailers.
+
+---
+
+## ▶️ How to Run (CLI Mode)
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+
+---
 
 Install dependencies:
 
@@ -115,7 +180,9 @@ XGBoost comparison
 
 Monitoring & drift checks
 
-🙋 Author
+👤 Author
 
-Prepared by Dikesh Chavhan
-Submitted as part of an ML Engineering hiring assignment.
+Dikesh Chavhan
+Machine Learning & Data Engineering Enthusiast
+
+🔗 LinkedIn — https://www.linkedin.com/in/dikeshchavhan18

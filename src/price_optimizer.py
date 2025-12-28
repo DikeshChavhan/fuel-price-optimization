@@ -2,6 +2,7 @@ import json
 import numpy as np
 import joblib
 import pandas as pd
+from datetime import datetime
 
 
 FEATURE_COLS = [
@@ -15,40 +16,60 @@ FEATURE_COLS = [
 
 
 def apply_business_rules(candidate_prices, base_price, avg_comp_price):
-    """
-    Applies realistic pricing constraints.
-    """
+    """Applies realistic pricing constraints."""
 
-    # Rule 1: limit price move to ±1.5 INR
     filtered = [p for p in candidate_prices if abs(p - base_price) <= 1.5]
-
-    # Rule 2: not more than 1 INR above competitors
     filtered = [p for p in filtered if p <= avg_comp_price + 1.0]
 
-    # if everything got filtered out -> fall back to original grid
-    if len(filtered) == 0:
-        return list(candidate_prices)
-
-    return filtered
+    return filtered if len(filtered) > 0 else list(candidate_prices)
 
 
-def recommend_price(today_json: str, model_path: str):
-    with open(today_json, "r") as f:
-        today = json.load(f)
+def recommend_price(today_input, model_path: str = "models/volume_model.pkl"):
+    """
+    Supports:
+    • JSON path (CLI mode)
+    • DataFrame (Streamlit mode)
+    """
 
+    # -------- Input Handling --------
+    if isinstance(today_input, str):
+        with open(today_input, "r") as f:
+            today = json.load(f)
+        row = pd.DataFrame([today])
+
+    elif isinstance(today_input, pd.DataFrame):
+        row = today_input.copy()
+
+    else:
+        raise TypeError("today_input must be a JSON filepath or a DataFrame")
+
+    # -------- Load Model --------
     model = joblib.load(model_path)
 
-    row = pd.DataFrame([today])
+    # -------- Price Handling --------
+    if "price" not in row.columns:
+        if "last_price" in row.columns:
+            row["price"] = row["last_price"]
+        else:
+            raise KeyError("Input must contain 'price' or 'last_price'")
 
-    # --- feature engineering consistent with training ---
+    # -------- Competitor Fallback --------
+    for col in ["comp1_price", "comp2_price", "comp3_price"]:
+        if col not in row.columns:
+            row[col] = row.get("competitor_price", row.get("comp_price", 0))
+
     row["avg_comp_price"] = row[["comp1_price", "comp2_price", "comp3_price"]].mean(axis=1)
     row["price_spread_vs_comp"] = row["price"] - row["avg_comp_price"]
 
-    # lag + moving averages fallback assumptions
+    # -------- Lag & MA --------
     row["lag_price_1"] = row["price"]
-    row["lag_volume_1"] = today.get("est_volume_yesterday", 15000)
+    row["lag_volume_1"] = row.get("est_volume_yesterday", 15000)
     row["ma_volume_7"] = row["lag_volume_1"]
     row["ma_volume_14"] = row["lag_volume_1"]
+
+    # -------- Date Handling (Fallback to today) --------
+    if "date" not in row.columns:
+        row["date"] = datetime.today().strftime("%Y-%m-%d")
 
     row["dayofweek"] = pd.to_datetime(row["date"]).dt.dayofweek
     row["month"] = pd.to_datetime(row["date"]).dt.month
@@ -57,11 +78,10 @@ def recommend_price(today_json: str, model_path: str):
     avg_comp_price = float(row["avg_comp_price"].iloc[0])
     cost_today = float(row["cost"].iloc[0])
 
-    # ---- candidate price grid ----
+    # ---- Candidate price grid ----
     candidates = np.round(np.arange(base_price - 2, base_price + 2.01, 0.1), 2)
     candidates = apply_business_rules(candidates, base_price, avg_comp_price)
 
-    # tracking variables instead of dict to avoid KeyError
     best_price = None
     best_profit = -1e18
     best_volume = None
@@ -72,7 +92,6 @@ def recommend_price(today_json: str, model_path: str):
         tmp["price_spread_vs_comp"] = p - avg_comp_price
 
         volume_pred = model.predict(tmp[FEATURE_COLS])[0]
-
         profit = (p - cost_today) * volume_pred
 
         if profit > best_profit:
@@ -87,6 +106,7 @@ def recommend_price(today_json: str, model_path: str):
     }
 
 
+# -------- CLI Mode Test --------
 if __name__ == "__main__":
     result = recommend_price(
         "data/today_example.json",
