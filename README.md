@@ -129,10 +129,6 @@ Install dependencies:
 ```bash
 pip install -r requirements.txt
 
----
-
-Install dependencies:
-
 ```bash
 pip install pandas numpy scikit-learn joblib pyarrow
 ```
@@ -165,9 +161,7 @@ python src/price_optimizer.py
 }
 ```
 
-
-
-
+---
 🚀 Possible Enhancements
 
 Add FastAPI service endpoint
@@ -180,9 +174,11 @@ XGBoost comparison
 
 Monitoring & drift checks
 
+---
 👤 Author
 
 Dikesh Chavhan
 Machine Learning & Data Engineering Enthusiast
 
 🔗 LinkedIn — https://www.linkedin.com/in/dikeshchavhan18
+---
