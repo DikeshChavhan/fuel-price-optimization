@@ -151,6 +151,30 @@ Generate price recommendation:
 python src/price_optimizer.py
 ```
 
+---
+🚀 Run the Streamlit Dashboard (UI Mode)
+
+To launch the interactive Fuel Price Optimization app:
+```bash
+streamlit run app.py
+```
+
+This will open the application in your browser, where you can:
+
+select fuel type
+
+enter competitor and cost inputs
+
+apply business constraints
+
+view demand & profit predictions
+
+see strategy insights and risk alerts
+
+export results and history logs
+
+---
+
 ## 📝 Example Output
 
 ```json
